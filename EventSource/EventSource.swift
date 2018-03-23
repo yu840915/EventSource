@@ -142,60 +142,6 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 		return Array(self.eventListeners.keys)
 	}
 
-//MARK: URLSessionDataDelegate
-
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-		if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
-			return
-		}
-
-		if self.readyState != EventSourceState.open {
-            return
-        }
-
-        self.receivedDataBuffer.append(data)
-        let eventStream = extractEventsFromBuffer()
-        self.parseEventStream(eventStream)
-    }
-
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        completionHandler(URLSession.ResponseDisposition.allow)
-
-		if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
-			return
-		}
-
-        self.readyState = EventSourceState.open
-        if self.onOpenCallback != nil {
-            DispatchQueue.main.async {
-                self.onOpenCallback!()
-            }
-        }
-    }
-
-    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        self.readyState = EventSourceState.closed
-
-		if self.receivedMessageToClose(task.response as? HTTPURLResponse) {
-			return
-		}
-
-        if error == nil || (error! as NSError).code != -999 {
-            let nanoseconds = Double(self.retryTime) / 1000.0 * Double(NSEC_PER_SEC)
-            let delayTime = DispatchTime.now() + Double(Int64(nanoseconds)) / Double(NSEC_PER_SEC)
-            DispatchQueue.main.asyncAfter(deadline: delayTime) {
-                self.connect()
-            }
-        }
-
-        DispatchQueue.main.async {
-            if let errorCallback = self.onErrorCallback {
-                errorCallback(error as NSError?)
-            } else {
-                self.errorBeforeSetErrorCallBack = error as NSError?
-            }
-        }
-    }
 
 //MARK: Helpers
 
@@ -363,4 +309,62 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 
         return "Basic \(base64String)"
     }
+}
+
+//MARK: URLSessionDataDelegate
+extension EventSource {
+    
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
+            return
+        }
+        
+        if self.readyState != EventSourceState.open {
+            return
+        }
+        
+        self.receivedDataBuffer.append(data)
+        let eventStream = extractEventsFromBuffer()
+        self.parseEventStream(eventStream)
+    }
+    
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        completionHandler(URLSession.ResponseDisposition.allow)
+        
+        if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
+            return
+        }
+        
+        self.readyState = EventSourceState.open
+        if self.onOpenCallback != nil {
+            DispatchQueue.main.async {
+                self.onOpenCallback!()
+            }
+        }
+    }
+    
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        self.readyState = EventSourceState.closed
+        
+        if self.receivedMessageToClose(task.response as? HTTPURLResponse) {
+            return
+        }
+        
+        if error == nil || (error! as NSError).code != -999 {
+            let nanoseconds = Double(self.retryTime) / 1000.0 * Double(NSEC_PER_SEC)
+            let delayTime = DispatchTime.now() + Double(Int64(nanoseconds)) / Double(NSEC_PER_SEC)
+            DispatchQueue.main.asyncAfter(deadline: delayTime) {
+                self.connect()
+            }
+        }
+        
+        DispatchQueue.main.async {
+            if let errorCallback = self.onErrorCallback {
+                errorCallback(error as NSError?)
+            } else {
+                self.errorBeforeSetErrorCallBack = error as NSError?
+            }
+        }
+    }
+    
 }
