@@ -18,6 +18,9 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 	static let DefaultsKey = "com.inaka.eventSource.lastEventId"
 
     let url: URL
+    var currentRequest: URLRequest? {
+        return task?.currentRequest
+    }
 	fileprivate let lastEventIDKey: String
     fileprivate let receivedString: NSString?
     fileprivate var onOpenCallback: (() -> Void)?
@@ -62,24 +65,29 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 //Mark: Connect
 
     func connect() {
+
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForResource = TimeInterval(INT_MAX)
+
+        self.readyState = EventSourceState.connecting
+        self.urlSession = newSession(configuration)
+        
+        self.task = urlSession!.dataTask(with: makeOpenRequest())
+
+		self.resumeSession()
+    }
+    
+    private func makeOpenRequest() -> URLRequest {
         var additionalHeaders = self.headers
         if let eventID = self.lastEventID {
             additionalHeaders["Last-Event-Id"] = eventID
         }
-
         additionalHeaders["Accept"] = "text/event-stream"
         additionalHeaders["Cache-Control"] = "no-cache"
-
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = TimeInterval(INT_MAX)
-        configuration.timeoutIntervalForResource = TimeInterval(INT_MAX)
-        configuration.httpAdditionalHeaders = additionalHeaders
-
-        self.readyState = EventSourceState.connecting
-        self.urlSession = newSession(configuration)
-        self.task = urlSession!.dataTask(with: self.url)
-
-		self.resumeSession()
+        var request = URLRequest(url: url)
+        request.timeoutInterval = TimeInterval(INT_MAX)
+        additionalHeaders.forEach{request.setValue($0.value, forHTTPHeaderField: $0.key)}
+        return request
     }
 
 	internal func resumeSession() {
@@ -314,12 +322,11 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 //MARK: URLSessionDataDelegate
 extension EventSource {
     
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+    fileprivate func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
         if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
             return
         }
-        
-        if self.readyState != EventSourceState.open {
+        guard self.readyState == EventSourceState.open else {
             return
         }
         
@@ -328,9 +335,11 @@ extension EventSource {
         self.parseEventStream(eventStream)
     }
     
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        completionHandler(URLSession.ResponseDisposition.allow)
-        
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        didReceiveData(data, forTask: dataTask)
+    }
+    
+    fileprivate func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
         if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
             return
         }
@@ -343,6 +352,11 @@ extension EventSource {
         }
     }
     
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        completionHandler(URLSession.ResponseDisposition.allow)
+        didReceiveResponse(response, forTask: dataTask)
+    }
+    
     open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         self.readyState = EventSourceState.closed
         
@@ -350,7 +364,7 @@ extension EventSource {
             return
         }
         
-        if error == nil || (error! as NSError).code != -999 {
+        if error == nil || (error! as NSError).code != NSURLErrorCancelled {
             let nanoseconds = Double(self.retryTime) / 1000.0 * Double(NSEC_PER_SEC)
             let delayTime = DispatchTime.now() + Double(Int64(nanoseconds)) / Double(NSEC_PER_SEC)
             DispatchQueue.main.asyncAfter(deadline: delayTime) {
@@ -366,5 +380,6 @@ extension EventSource {
             }
         }
     }
+    
     
 }
