@@ -11,29 +11,19 @@ import UIKit
 class TestableEventSource: EventSource {
 
 	func callDidReceiveResponse() {
-		let delegate = self as URLSessionDataDelegate
-
-		delegate.urlSession!(self.urlSession!, dataTask: self.task!, didReceive: URLResponse()) { (NSURLSessionResponseDisposition) -> Void in
-
-		}
+        didReceiveResponse(URLResponse(), forTask: task!)
 	}
 
 	func callDidReceiveDataWithResponse(_ dataTask: URLSessionDataTask) {
-		let delegate = self as URLSessionDataDelegate
-		delegate.urlSession!(self.urlSession!, dataTask: dataTask, didReceive: "".data(using: String.Encoding.utf8)!)
+        didReceiveData("".data(using: String.Encoding.utf8)!, forTask: dataTask)
 	}
 
 	func callDidReceiveData(_ data: Data) {
-		let delegate = self as URLSessionDataDelegate
-		delegate.urlSession!(self.urlSession!, dataTask: self.task!, didReceive: data)
+        didReceiveData(data, forTask: task!)
 	}
 
 	func callDidCompleteWithError(_ error: String) {
-		let errorToReturn = NSError(domain: "Mock", code: 0, userInfo: ["mock":error])
-
-		let delegate = self as URLSessionDataDelegate
-		delegate.urlSession!(self.urlSession!, task: self.task!, didCompleteWithError: errorToReturn)
-
+        didCompleteTask(task!, withError: NSError(domain: "Mock", code: 0, userInfo: ["mock":error]))
 	}
 
 	override internal func resumeSession() {

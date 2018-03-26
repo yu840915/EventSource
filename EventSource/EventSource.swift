@@ -14,6 +14,13 @@ public enum EventSourceState {
     case closed
 }
 
+public class HTTPClientCommunicator: NSObject {
+    var urlSession: Foundation.URLSession?
+    func conntect(withRequest request: URLRequest) -> URLSessionDataTask? {
+        return urlSession?.dataTask(with: request)
+    }
+}
+
 open class EventSource: NSObject, URLSessionDataDelegate {
 	static let DefaultsKey = "com.inaka.eventSource.lastEventId"
 
@@ -30,7 +37,7 @@ open class EventSource: NSObject, URLSessionDataDelegate {
     open fileprivate(set) var retryTime = 3000
     fileprivate var eventListeners = Dictionary<String, (_ id: String?, _ event: String?, _ data: String?) -> Void>()
     fileprivate var headers: Dictionary<String, String>
-    internal var urlSession: Foundation.URLSession?
+    let httpClientCommunicator: HTTPClientCommunicator
     internal var task: URLSessionDataTask?
     fileprivate var operationQueue: OperationQueue
     fileprivate var errorBeforeSetErrorCallBack: NSError?
@@ -40,8 +47,7 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 
     var event = Dictionary<String, String>()
 
-
-    public init(url: String, headers: [String : String] = [:]) {
+    public init(url: String, headers: [String : String] = [:], httpClientCommunicator: HTTPClientCommunicator = HTTPClientCommunicator()) {
 
         self.url = URL(string: url)!
         self.headers = headers
@@ -49,6 +55,7 @@ open class EventSource: NSObject, URLSessionDataDelegate {
         self.operationQueue = OperationQueue()
         self.receivedString = nil
         self.receivedDataBuffer = NSMutableData()
+        self.httpClientCommunicator = httpClientCommunicator
 
         let port = String(self.url.port ?? 80)
 		let relativePath = self.url.relativePath
@@ -61,7 +68,7 @@ open class EventSource: NSObject, URLSessionDataDelegate {
         super.init()
         self.connect()
     }
-
+    
 //Mark: Connect
 
     func connect() {
@@ -70,9 +77,9 @@ open class EventSource: NSObject, URLSessionDataDelegate {
         configuration.timeoutIntervalForResource = TimeInterval(INT_MAX)
 
         self.readyState = EventSourceState.connecting
-        self.urlSession = newSession(configuration)
+        httpClientCommunicator.urlSession = newSession(configuration)
         
-        self.task = urlSession!.dataTask(with: makeOpenRequest())
+        task = httpClientCommunicator.conntect(withRequest: makeOpenRequest())
 
 		self.resumeSession()
     }
@@ -104,7 +111,7 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 
     open func close() {
         self.readyState = EventSourceState.closed
-        self.urlSession?.invalidateAndCancel()
+        task?.cancel()
     }
 
 	fileprivate func receivedMessageToClose(_ httpResponse: HTTPURLResponse?) -> Bool {
@@ -319,14 +326,8 @@ open class EventSource: NSObject, URLSessionDataDelegate {
     }
 }
 
-//MARK: URLSessionDataDelegate
-extension EventSource {
-    
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        didReceiveData(data, forTask: dataTask)
-    }
-    
-    fileprivate func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
+extension EventSource: URLSessionTaskEventDelegate {
+    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
         if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
             return
         }
@@ -339,12 +340,7 @@ extension EventSource {
         self.parseEventStream(eventStream)
     }
     
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        completionHandler(URLSession.ResponseDisposition.allow)
-        didReceiveResponse(response, forTask: dataTask)
-    }
-    
-    fileprivate func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
+    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
         if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
             return
         }
@@ -357,11 +353,7 @@ extension EventSource {
         }
     }
     
-    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        didCompleteTask(task, withError: error)
-    }
-    
-    fileprivate func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
+    func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
         self.readyState = EventSourceState.closed
         
         if self.receivedMessageToClose(task.response as? HTTPURLResponse) {
@@ -384,5 +376,26 @@ extension EventSource {
             }
         }
     }
+}
+
+//MARK: URLSessionDataDelegate
+extension EventSource {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        didReceiveData(data, forTask: dataTask)
+    }
     
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        completionHandler(URLSession.ResponseDisposition.allow)
+        didReceiveResponse(response, forTask: dataTask)
+    }
+    
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        didCompleteTask(task, withError: error)
+    }
+}
+
+protocol URLSessionTaskEventDelegate {
+    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask)
+    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask)
+    func didCompleteTask(_ task: URLSessionTask, withError error: Error?)
 }
