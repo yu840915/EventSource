@@ -322,6 +322,10 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 //MARK: URLSessionDataDelegate
 extension EventSource {
     
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        didReceiveData(data, forTask: dataTask)
+    }
+    
     fileprivate func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
         if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
             return
@@ -335,8 +339,9 @@ extension EventSource {
         self.parseEventStream(eventStream)
     }
     
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        didReceiveData(data, forTask: dataTask)
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        completionHandler(URLSession.ResponseDisposition.allow)
+        didReceiveResponse(response, forTask: dataTask)
     }
     
     fileprivate func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
@@ -352,12 +357,11 @@ extension EventSource {
         }
     }
     
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        completionHandler(URLSession.ResponseDisposition.allow)
-        didReceiveResponse(response, forTask: dataTask)
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        didCompleteTask(task, withError: error)
     }
     
-    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    fileprivate func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
         self.readyState = EventSourceState.closed
         
         if self.receivedMessageToClose(task.response as? HTTPURLResponse) {
@@ -380,6 +384,5 @@ extension EventSource {
             }
         }
     }
-    
     
 }
