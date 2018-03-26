@@ -25,8 +25,9 @@ class TestableEventSource: EventSource {
 	func callDidCompleteWithError(_ error: String) {
         didCompleteTask(task!, withError: NSError(domain: "Mock", code: 0, userInfo: ["mock":error]))
 	}
-
-	override internal func resumeSession() {
-		self.readyState = EventSourceState.open
-	}
+    
+    override func connect() {
+        super.connect()
+        readyState = .open
+    }
 }

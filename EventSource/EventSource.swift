@@ -14,10 +14,40 @@ public enum EventSourceState {
     case closed
 }
 
-public class HTTPClientCommunicator: NSObject {
-    var urlSession: Foundation.URLSession?
+public class HTTPClientCommunicator: NSObject, URLSessionDataDelegate {
+    private var operationQueue = OperationQueue()
+    var urlSession: Foundation.URLSession!
+    var taskEventDelegate: URLSessionTaskEventDelegate!
     func conntect(withRequest request: URLRequest) -> URLSessionDataTask? {
-        return urlSession?.dataTask(with: request)
+        let task = urlSession.dataTask(with: request)
+        task.resume()
+        return task
+    }
+    
+    public override init() {
+        super.init()
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForResource = TimeInterval(INT_MAX)
+        urlSession = newSession(configuration)
+    }
+    
+    internal func newSession(_ configuration: URLSessionConfiguration) -> Foundation.URLSession {
+        return Foundation.URLSession(configuration: configuration,
+                                     delegate: self,
+                                     delegateQueue: operationQueue)
+    }
+
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        taskEventDelegate.didReceiveData(data, forTask: dataTask)
+    }
+    
+    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        completionHandler(URLSession.ResponseDisposition.allow)
+        taskEventDelegate.didReceiveResponse(response, forTask: dataTask)
+    }
+    
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        taskEventDelegate.didCompleteTask(task, withError: error)
     }
 }
 
@@ -66,22 +96,15 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 		self.lastEventIDKey = "\(EventSource.DefaultsKey).\(self.uniqueIdentifier)"
 
         super.init()
+        httpClientCommunicator.taskEventDelegate = self
         self.connect()
     }
     
 //Mark: Connect
 
     func connect() {
-
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForResource = TimeInterval(INT_MAX)
-
         self.readyState = EventSourceState.connecting
-        httpClientCommunicator.urlSession = newSession(configuration)
-        
         task = httpClientCommunicator.conntect(withRequest: makeOpenRequest())
-
-		self.resumeSession()
     }
     
     private func makeOpenRequest() -> URLRequest {
@@ -95,16 +118,6 @@ open class EventSource: NSObject, URLSessionDataDelegate {
         request.timeoutInterval = TimeInterval(INT_MAX)
         additionalHeaders.forEach{request.setValue($0.value, forHTTPHeaderField: $0.key)}
         return request
-    }
-
-	internal func resumeSession() {
-		self.task!.resume()
-	}
-
-    internal func newSession(_ configuration: URLSessionConfiguration) -> Foundation.URLSession {
-        return Foundation.URLSession(configuration: configuration,
-								 delegate: self,
-						    delegateQueue: operationQueue)
     }
 
 //Mark: Close
