@@ -11,12 +11,10 @@ import Foundation
 public class EventSourceSessionManager: NSObject, URLSessionDataDelegate {
     private var operationQueue = OperationQueue()
     var urlSession: Foundation.URLSession!
-    var taskEventDelegate: URLSessionTaskEventDelegate!
     var eventSources = Set<EventSource>()
     func add(_ eventSource: EventSource) {
         eventSources.insert(eventSource)
         eventSource.httpClientCommunicator = self
-        taskEventDelegate = eventSource
         eventSource.connect()
     }
     
@@ -40,15 +38,15 @@ public class EventSourceSessionManager: NSObject, URLSessionDataDelegate {
     }
     
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        taskEventDelegate.didReceiveData(data, forTask: dataTask)
+        eventSources.forEach{$0.didReceiveData(data, forTask: dataTask)}
     }
     
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         completionHandler(URLSession.ResponseDisposition.allow)
-        taskEventDelegate.didReceiveResponse(response, forTask: dataTask)
+        eventSources.forEach{$0.didReceiveResponse(response, forTask: dataTask)}
     }
     
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        taskEventDelegate.didCompleteTask(task, withError: error)
+        eventSources.forEach{$0.didCompleteTask(task, withError: error)}
     }
 }
