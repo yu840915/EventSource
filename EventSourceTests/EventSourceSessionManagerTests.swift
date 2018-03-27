@@ -25,24 +25,26 @@ class EventSourceSessionManagerTests: XCTestCase {
         let source = EventSource(url: "https://test.cc/sse")
         manager.add(source)
         
-        XCTAssertNotNil(source.httpClientCommunicator)
+        XCTAssertNotNil(source.httpURLRequestExecutor)
         XCTAssertTrue(manager.eventSources.contains(source))
     }
     
     func testAddEventStartConnection() {
-        let fakeManager = FakeConnectionManager()
+        let client = FakeHTTPClient()
+        let manager = EventSourceSessionManager(httpClientWrapper: client)
         let source = EventSource(url: "https://test.cc/sse")
         
-        fakeManager.add(source)
+        manager.add(source)
         
-        XCTAssertEqual(fakeManager.startingConnectionCounter, 1)
+        XCTAssertEqual(client.startingConnectionCounter, 1)
     }
     
 }
 
-fileprivate class FakeConnectionManager: EventSourceSessionManager {
+fileprivate class FakeHTTPClient: HTTPClientWrapping {
+    weak var taskEventDelegate: URLSessionTaskEventDelegate?
     private(set) var startingConnectionCounter = 0
-    override func connect(withRequest request: URLRequest) -> URLSessionDataTask? {
+    func execute(_ request: URLRequest) -> URLSessionDataTask? {
         startingConnectionCounter += 1
         return nil
     }

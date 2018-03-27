@@ -14,6 +14,10 @@ public enum EventSourceState {
     case closed
 }
 
+protocol HTTPURLRequestExecutable: AnyObject {
+    func execute(_ request: URLRequest) -> URLSessionDataTask?
+}
+
 open class EventSource: NSObject {
 	static let DefaultsKey = "com.inaka.eventSource.lastEventId"
 
@@ -30,7 +34,7 @@ open class EventSource: NSObject {
     open fileprivate(set) var retryTime = 3000
     fileprivate var eventListeners = Dictionary<String, (_ id: String?, _ event: String?, _ data: String?) -> Void>()
     fileprivate var headers: Dictionary<String, String>
-    var httpClientCommunicator: EventSourceSessionManager?
+    var httpURLRequestExecutor: HTTPURLRequestExecutable?
     internal var task: URLSessionDataTask?
     fileprivate var errorBeforeSetErrorCallBack: NSError?
     internal let receivedDataBuffer: NSMutableData
@@ -61,11 +65,11 @@ open class EventSource: NSObject {
 //Mark: Connect
 
     func connect() {
-        guard let communicator = httpClientCommunicator else {
+        guard let communicator = httpURLRequestExecutor else {
             return
         }
         readyState = .connecting
-        task = communicator.connect(withRequest: makeOpenRequest())
+        task = communicator.execute(makeOpenRequest())
     }
     
     private func makeOpenRequest() -> URLRequest {
@@ -352,7 +356,7 @@ extension EventSource: URLSessionTaskEventDelegate {
     }
 }
 
-protocol URLSessionTaskEventDelegate {
+protocol URLSessionTaskEventDelegate: AnyObject {
     func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask)
     func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask)
     func didCompleteTask(_ task: URLSessionTask, withError error: Error?)
