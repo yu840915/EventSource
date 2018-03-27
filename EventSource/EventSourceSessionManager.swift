@@ -12,12 +12,14 @@ protocol HTTPClientWrapping: HTTPURLRequestExecutable {
     weak var taskEventDelegate: URLSessionTaskEventDelegate? {get set}
 }
 
-public class EventSourceSessionManager: NSObject {
+public class EventSourceSessionManager: NSObject, URLSessionTaskEventDelegate {
     let httpClientWrapper: HTTPClientWrapping
     var eventSources = Set<EventSource>()
     
     init(httpClientWrapper: HTTPClientWrapping = URLSessionBridge()) {
         self.httpClientWrapper = httpClientWrapper
+        super.init()
+        httpClientWrapper.taskEventDelegate = self
     }
     
     func add(_ eventSource: EventSource) {

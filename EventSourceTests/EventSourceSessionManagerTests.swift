@@ -39,6 +39,8 @@ class EventSourceSessionManagerTests: XCTestCase {
         XCTAssertEqual(client.startingConnectionCounter, 1)
     }
     
+    
+    
 }
 
 fileprivate class FakeHTTPClient: HTTPClientWrapping {

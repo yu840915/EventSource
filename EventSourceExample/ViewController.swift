@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     @IBOutlet fileprivate weak var nameLabel: UILabel!
     @IBOutlet fileprivate weak var idLabel: UILabel!
     @IBOutlet fileprivate weak var squareConstraint: NSLayoutConstraint!
+    var eventSourceManager: EventSourceSessionManager!
     var eventSource: EventSource?
 
     override func viewDidLoad() {
@@ -25,8 +26,11 @@ class ViewController: UIViewController {
         let password = "ae10ff39ca41dgf0a8"
 
         let basicAuthAuthorization = EventSource.basicAuth(username, password: password)
-
-        self.eventSource = EventSource(url: server, headers: ["Authorization" : basicAuthAuthorization])
+        
+        eventSourceManager = EventSourceSessionManager()
+        let source = EventSource(url: "https://push.wards.io/sse")
+        self.eventSource = source
+        eventSourceManager.add(source)
 
         self.eventSource?.onOpen {
             self.status.backgroundColor = UIColor(red: 166/255, green: 226/255, blue: 46/255, alpha: 1)
@@ -40,6 +44,7 @@ class ViewController: UIViewController {
 
         self.eventSource?.onMessage { (id, event, data) in
             self.updateLabels(id, event: event, data: data)
+            debugPrint("Received data at \(Date()), length \(data?.count ?? 0)")
         }
 
         self.eventSource?.addEventListener("user-connected") { (id, event, data) in

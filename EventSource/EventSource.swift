@@ -18,6 +18,12 @@ protocol HTTPURLRequestExecutable: AnyObject {
     func execute(_ request: URLRequest) -> URLSessionDataTask?
 }
 
+protocol URLSessionTaskEventDelegate: AnyObject {
+    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask)
+    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask)
+    func didCompleteTask(_ task: URLSessionTask, withError error: Error?)
+}
+
 open class EventSource: NSObject {
 	static let DefaultsKey = "com.inaka.eventSource.lastEventId"
 
@@ -356,8 +362,3 @@ extension EventSource: URLSessionTaskEventDelegate {
     }
 }
 
-protocol URLSessionTaskEventDelegate: AnyObject {
-    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask)
-    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask)
-    func didCompleteTask(_ task: URLSessionTask, withError error: Error?)
-}
