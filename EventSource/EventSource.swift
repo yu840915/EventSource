@@ -14,44 +14,7 @@ public enum EventSourceState {
     case closed
 }
 
-public class HTTPClientCommunicator: NSObject, URLSessionDataDelegate {
-    private var operationQueue = OperationQueue()
-    var urlSession: Foundation.URLSession!
-    var taskEventDelegate: URLSessionTaskEventDelegate!
-    func conntect(withRequest request: URLRequest) -> URLSessionDataTask? {
-        let task = urlSession.dataTask(with: request)
-        task.resume()
-        return task
-    }
-    
-    public override init() {
-        super.init()
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForResource = TimeInterval(INT_MAX)
-        urlSession = newSession(configuration)
-    }
-    
-    internal func newSession(_ configuration: URLSessionConfiguration) -> Foundation.URLSession {
-        return Foundation.URLSession(configuration: configuration,
-                                     delegate: self,
-                                     delegateQueue: operationQueue)
-    }
-
-    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        taskEventDelegate.didReceiveData(data, forTask: dataTask)
-    }
-    
-    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        completionHandler(URLSession.ResponseDisposition.allow)
-        taskEventDelegate.didReceiveResponse(response, forTask: dataTask)
-    }
-    
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        taskEventDelegate.didCompleteTask(task, withError: error)
-    }
-}
-
-open class EventSource: NSObject, URLSessionDataDelegate {
+open class EventSource: NSObject {
 	static let DefaultsKey = "com.inaka.eventSource.lastEventId"
 
     let url: URL
@@ -67,9 +30,8 @@ open class EventSource: NSObject, URLSessionDataDelegate {
     open fileprivate(set) var retryTime = 3000
     fileprivate var eventListeners = Dictionary<String, (_ id: String?, _ event: String?, _ data: String?) -> Void>()
     fileprivate var headers: Dictionary<String, String>
-    let httpClientCommunicator: HTTPClientCommunicator
+    var httpClientCommunicator: EventSourceSessionManager?
     internal var task: URLSessionDataTask?
-    fileprivate var operationQueue: OperationQueue
     fileprivate var errorBeforeSetErrorCallBack: NSError?
     internal let receivedDataBuffer: NSMutableData
 	fileprivate let uniqueIdentifier: String
@@ -77,15 +39,13 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 
     var event = Dictionary<String, String>()
 
-    public init(url: String, headers: [String : String] = [:], httpClientCommunicator: HTTPClientCommunicator = HTTPClientCommunicator()) {
+    public init(url: String, headers: [String : String] = [:]) {
 
         self.url = URL(string: url)!
         self.headers = headers
         self.readyState = EventSourceState.closed
-        self.operationQueue = OperationQueue()
         self.receivedString = nil
         self.receivedDataBuffer = NSMutableData()
-        self.httpClientCommunicator = httpClientCommunicator
 
         let port = String(self.url.port ?? 80)
 		let relativePath = self.url.relativePath
@@ -96,15 +56,16 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 		self.lastEventIDKey = "\(EventSource.DefaultsKey).\(self.uniqueIdentifier)"
 
         super.init()
-        httpClientCommunicator.taskEventDelegate = self
-        self.connect()
     }
     
 //Mark: Connect
 
     func connect() {
-        self.readyState = EventSourceState.connecting
-        task = httpClientCommunicator.conntect(withRequest: makeOpenRequest())
+        guard let communicator = httpClientCommunicator else {
+            return
+        }
+        readyState = .connecting
+        task = communicator.connect(withRequest: makeOpenRequest())
     }
     
     private func makeOpenRequest() -> URLRequest {
@@ -388,22 +349,6 @@ extension EventSource: URLSessionTaskEventDelegate {
                 self.errorBeforeSetErrorCallBack = error as NSError?
             }
         }
-    }
-}
-
-//MARK: URLSessionDataDelegate
-extension EventSource {
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        didReceiveData(data, forTask: dataTask)
-    }
-    
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        completionHandler(URLSession.ResponseDisposition.allow)
-        didReceiveResponse(response, forTask: dataTask)
-    }
-    
-    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        didCompleteTask(task, withError: error)
     }
 }
 

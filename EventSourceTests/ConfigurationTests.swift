@@ -14,10 +14,13 @@ class ConfigurationTests: XCTestCase {
 
 	let domain = "http://testdomain.com"
 	var sut: TestableEventSource!
+    var sessionManager: EventSourceSessionManager!
 
 	override func setUp() {
-		sut = TestableEventSource(url: domain, headers: ["Authorization" : "basic auth"])
 		super.setUp()
+        sessionManager = EventSourceSessionManager()
+        sut = TestableEventSource(url: domain, headers: ["Authorization" : "basic auth"])
+        sessionManager.add(sut)
 	}
 
 	func testURL() {

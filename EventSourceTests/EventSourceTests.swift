@@ -14,10 +14,13 @@ class EventSourceTests: XCTestCase {
 
 	let domain = "http://testdomain.com"
 	var sut: TestableEventSource!
+    var sessionManager: EventSourceSessionManager!
 
 	override func setUp() {
-		sut = TestableEventSource(url: domain, headers: ["Authorization" : "basic auth"])
-		super.setUp()
+        super.setUp()
+        sessionManager = EventSourceSessionManager()
+        sut = TestableEventSource(url: domain, headers: ["Authorization" : "basic auth"])
+        sessionManager.add(sut)
 	}
 
 // MARK: Testing onOpen and onError
@@ -112,6 +115,9 @@ class EventSourceTests: XCTestCase {
 
 		expectation = self.expectation(description: "onMessage should be called")
 		let secondSut = TestableEventSource(url: "http://otherdomain.com", headers: ["Authorization" : "basic auth"])
+        secondSut.httpClientCommunicator = sessionManager
+        sessionManager.taskEventDelegate = secondSut
+        secondSut.connect()
 		secondSut.onMessage { (id, event, data) in
 			XCTAssertEqual(id!, "event-id-99", "the event id should be received")
 			expectation!.fulfill()

@@ -13,10 +13,13 @@ import XCTest
 class SplittedEvents: XCTestCase {
 
     var sut: TestableEventSource!
+    var sessionManager: EventSourceSessionManager!
 
 	override func setUp() {
-		sut = TestableEventSource(url: "http://test.com", headers: ["Authorization" : "basic auth"])
-		super.setUp()
+        super.setUp()
+        sessionManager = EventSourceSessionManager()
+        sut = TestableEventSource(url: "http://test.com", headers: ["Authorization" : "basic auth"])
+        sessionManager.add(sut)
 	}
 
 	func testEventDataIsRemovedFromBufferWhenProcessed() {
