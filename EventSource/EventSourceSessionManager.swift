@@ -8,23 +8,23 @@
 
 import Foundation
 
-protocol HTTPClientWrapping: HTTPURLRequestExecutable {
+protocol EventSourceHTTPClientBridging: HTTPURLRequestExecutable {
     weak var taskEventDelegate: URLSessionTaskEventDelegate? {get set}
 }
 
 public class EventSourceSessionManager: NSObject, URLSessionTaskEventDelegate {
-    let httpClientWrapper: HTTPClientWrapping
+    let httpClientBridge: EventSourceHTTPClientBridging
     var eventSources = Set<EventSource>()
     
-    init(httpClientWrapper: HTTPClientWrapping = URLSessionBridge()) {
-        self.httpClientWrapper = httpClientWrapper
+    init(httpClientWrapper: EventSourceHTTPClientBridging = URLSessionBridge()) {
+        self.httpClientBridge = httpClientWrapper
         super.init()
         httpClientWrapper.taskEventDelegate = self
     }
     
     func add(_ eventSource: EventSource) {
         eventSources.insert(eventSource)
-        eventSource.httpURLRequestExecutor = httpClientWrapper
+        eventSource.httpURLRequestExecutor = httpClientBridge
         eventSource.connect()
     }
     
@@ -45,58 +45,3 @@ public class EventSourceSessionManager: NSObject, URLSessionTaskEventDelegate {
     }
 }
 
-public class URLSessionBridge: NSObject, HTTPClientWrapping {
-    weak var taskEventDelegate: URLSessionTaskEventDelegate?
-    var urlSession: Foundation.URLSession!
-    private var operationQueue = OperationQueue()
-    private var delegateRelay: URLSessionTaskDelegateRelay!
-    
-    public override init() {
-        super.init()
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForResource = TimeInterval(INT_MAX)
-        let relay = URLSessionTaskDelegateRelay()
-        relay.delgate = self
-        urlSession = Foundation.URLSession(configuration: configuration, delegate: relay, delegateQueue: operationQueue)
-        delegateRelay = relay
-    }
-    
-    func execute(_ request: URLRequest) -> URLSessionDataTask? {
-        let task = urlSession.dataTask(with: request)
-        task.resume()
-        return task
-    }
-}
-
-extension URLSessionBridge: URLSessionTaskEventDelegate {
-    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
-        taskEventDelegate?.didReceiveData(data, forTask: dataTask)
-    }
-    
-    func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
-        taskEventDelegate?.didCompleteTask(task, withError: error)
-    }
-    
-    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
-        taskEventDelegate?.didReceiveResponse(response, forTask: dataTask)
-    }
-}
-
-extension URLSessionBridge {
-    public class URLSessionTaskDelegateRelay: NSObject, URLSessionDataDelegate {
-        weak var delgate: URLSessionTaskEventDelegate?
-        
-        public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-            delgate?.didReceiveData(data, forTask: dataTask)
-        }
-        
-        public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-            completionHandler(URLSession.ResponseDisposition.allow)
-            delgate?.didReceiveResponse(response, forTask: dataTask)
-        }
-        
-        public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-            delgate?.didCompleteTask(task, withError: error)
-        }
-    }
-}

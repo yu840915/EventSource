@@ -104,7 +104,7 @@ class EventSourceSessionManagerTests: XCTestCase {
     }
 }
 
-fileprivate class FakeHTTPClient: HTTPClientWrapping {
+fileprivate class FakeHTTPClient: EventSourceHTTPClientBridging {
     weak var taskEventDelegate: URLSessionTaskEventDelegate?
     private(set) var lastTask: MockNSURLSessionDataTask?
     private(set) var startingConnectionCounter = 0
