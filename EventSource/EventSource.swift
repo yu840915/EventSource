@@ -49,21 +49,24 @@ open class EventSource: NSObject, URLSessionTaskEventDelegate {
 
     var event = Dictionary<String, String>()
 
-    public init(url: String, headers: [String : String] = [:]) {
-
-        self.url = URL(string: url)!
-        self.headers = headers
-        self.readyState = EventSourceState.closed
-        self.receivedString = nil
-        self.receivedDataBuffer = NSMutableData()
-
-        let port = String(self.url.port ?? 80)
-		let relativePath = self.url.relativePath
-		let host = self.url.host ?? ""
-        let scheme = self.url.scheme ?? ""
-
-		self.uniqueIdentifier = "\(scheme).\(host).\(port).\(relativePath)"
-		self.lastEventIDKey = "\(EventSource.DefaultsKey).\(self.uniqueIdentifier)"
+    convenience public init(url: String, headers: [String : String] = [:]) {
+        self.init(url: URL(string: url)!, additionalHeaders: headers)
+    }
+    
+    public init(url: URL, additionalHeaders: [String: String] = [:]) {
+        self.url = url
+        headers = additionalHeaders
+        readyState = .closed
+        receivedString = nil
+        receivedDataBuffer = NSMutableData()
+        
+        let port = String(url.port ?? 80)
+        let relativePath = url.relativePath
+        let host = url.host ?? ""
+        let scheme = url.scheme ?? ""
+        
+        uniqueIdentifier = "\(scheme).\(host).\(port).\(relativePath)"
+        lastEventIDKey = "\(EventSource.DefaultsKey).\(uniqueIdentifier)"
 
         super.init()
     }
