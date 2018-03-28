@@ -26,10 +26,10 @@ class EventSourceSessionRunnerTests: XCTestCase {
     
     func testAddEventSourceToNewManager() {
         let source = EventSourceSession(url: "https://test.cc/sse")
-        runner.add(source)
+        runner.forceRun(source)
         
         XCTAssertNotNil(source.httpURLRequestExecutor)
-        XCTAssertTrue(runner.eventSources.contains(source))
+        XCTAssertTrue(runner.sessions.contains(source))
         XCTAssertEqual(client.startingConnectionCounter, 1)
         XCTAssertNotNil(source.task)
         XCTAssertEqual(source.task, client.lastTask)
@@ -38,7 +38,7 @@ class EventSourceSessionRunnerTests: XCTestCase {
     func testRelayCallbackReceived() {
         let source = CallbackCounterEventSource(url: "https://test.cc/sse")
         
-        runner.add(source)
+        runner.forceRun(source)
         
         guard let task = client.lastTask else {
             XCTFail("Last task is nil")
@@ -72,12 +72,12 @@ class EventSourceSessionRunnerTests: XCTestCase {
         let source1 = CallbackCounterEventSource(url: "https://test1.cc/sse")
         let source2 = CallbackCounterEventSource(url: "https://test2.cc/sse")
         
-        runner.add(source1)
+        runner.forceRun(source1)
         guard let task1 = client.lastTask else {
             XCTFail("Task 1 is nil")
             return
         }
-        runner.add(source2)
+        runner.forceRun(source2)
         guard let task2 = client.lastTask else {
             XCTFail("Task 2 is nil")
             return
@@ -103,6 +103,14 @@ class EventSourceSessionRunnerTests: XCTestCase {
         XCTAssertEqual(source2.didReceiveDataCounter, 1)
     }
     
+    func testAddRunningEventSourceSession() {
+        let origRunner = EventSourceSessionRunner()
+        let source = EventSourceSession(url: "https://www.test.com/sse")
+        origRunner.forceRun(source)
+        
+        XCTAssertThrowsError(try runner.run(source))
+    }
+    
     func testNoMemoryLeak() {
         var bridge: URLSessionBridge? = URLSessionBridge()
         weak var bridgeRef: URLSessionBridge? = bridge
@@ -113,8 +121,8 @@ class EventSourceSessionRunnerTests: XCTestCase {
         var session2: EventSourceSession? = EventSourceSession(url: "https://push.wards.io/sse")
         weak var session2Ref: EventSourceSession? = session2
         
-        runner!.add(session1!)
-        runner!.add(session2!)
+        runner!.forceRun(session1!)
+        runner!.forceRun(session2!)
         
         bridge = nil
         session1 = nil

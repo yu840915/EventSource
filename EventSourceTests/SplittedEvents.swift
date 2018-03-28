@@ -19,7 +19,7 @@ class SplittedEvents: XCTestCase {
         super.setUp()
         sessionRunner = EventSourceSessionRunner()
         sut = TestableEventSource(url: "http://test.com", headers: ["Authorization" : "basic auth"])
-        sessionRunner.add(sut)
+        sessionRunner.forceRun(sut)
 	}
 
 	func testEventDataIsRemovedFromBufferWhenProcessed() {

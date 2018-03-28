@@ -14,7 +14,7 @@ protocol EventSourceHTTPClientBridging: HTTPURLRequestExecutable {
 
 public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
     let httpClientBridge: EventSourceHTTPClientBridging
-    var eventSources = Set<EventSourceSession>()
+    var sessions = Set<EventSourceSession>()
     
     init(httpClientWrapper: EventSourceHTTPClientBridging = URLSessionBridge()) {
         self.httpClientBridge = httpClientWrapper
@@ -22,10 +22,26 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
         httpClientWrapper.taskEventDelegate = self
     }
     
-    func add(_ eventSource: EventSourceSession) {
-        eventSources.insert(eventSource)
+    func run(_ eventSource: EventSourceSession) throws {
+        try checkSessionIsClean(eventSource)
+        sessions.insert(eventSource)
         eventSource.httpURLRequestExecutor = httpClientBridge
         eventSource.connect()
+    }
+    
+    private func checkSessionIsClean(_ eventSource: EventSourceSession) throws {
+        let error = NSError(domain: "com.inaka.EventSource", code: -999, userInfo: [NSLocalizedDescriptionKey: "Session isn't clean"])
+        guard eventSource.httpURLRequestExecutor == nil, eventSource.readyState == .closed else {
+            throw error
+        }
+    }
+    
+    func forceRun(_ eventSource: EventSourceSession) {
+        do {
+            try run(eventSource)
+        } catch let error {
+            assertionFailure(error.localizedDescription)
+        }
     }
     
     func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
@@ -33,7 +49,7 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
     }
     
     private func taskEventDelegate(for task: URLSessionTask) -> URLSessionTaskEventDelegate? {
-        return eventSources.first{$0.task == task}
+        return sessions.first{$0.task == task}
     }
 
     func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {

@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     @IBOutlet fileprivate weak var nameLabel: UILabel!
     @IBOutlet fileprivate weak var idLabel: UILabel!
     @IBOutlet fileprivate weak var squareConstraint: NSLayoutConstraint!
-    var eventSourceManager: EventSourceSessionRunner!
+    var runner: EventSourceSessionRunner!
     var eventSource: EventSourceSession?
 
     override func viewDidLoad() {
@@ -27,10 +27,10 @@ class ViewController: UIViewController {
 
         let basicAuthAuthorization = EventSourceSession.basicAuth(username, password: password)
         
-        eventSourceManager = EventSourceSessionRunner()
+        runner = EventSourceSessionRunner()
         let source = EventSourceSession(url: "https://push.wards.io/sse")
         self.eventSource = source
-        eventSourceManager.add(source)
+        runner.forceRun(source)
 
         self.eventSource?.onOpen {
             self.status.backgroundColor = UIColor(red: 166/255, green: 226/255, blue: 46/255, alpha: 1)
