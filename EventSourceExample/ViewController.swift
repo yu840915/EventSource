@@ -30,7 +30,7 @@ class ViewController: UIViewController {
         runner = EventSourceSessionRunner()
         let source = EventSourceSession(url: "https://push.wards.io/sse")
         self.eventSource = source
-        runner.forceRun(source)
+        runner.run(source)
 
         self.eventSource?.onOpen {
             self.status.backgroundColor = UIColor(red: 166/255, green: 226/255, blue: 46/255, alpha: 1)

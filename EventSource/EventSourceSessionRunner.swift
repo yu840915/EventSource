@@ -14,7 +14,7 @@ protocol EventSourceHTTPClientBridging: HTTPURLRequestExecutable {
 
 public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
     let httpClientBridge: EventSourceHTTPClientBridging
-    var sessions = Set<EventSourceSession>()
+    var runningSessions = Set<EventSourceSession>()
     
     init(httpClientWrapper: EventSourceHTTPClientBridging = URLSessionBridge()) {
         self.httpClientBridge = httpClientWrapper
@@ -22,9 +22,9 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
         httpClientWrapper.taskEventDelegate = self
     }
     
-    func run(_ eventSource: EventSourceSession) throws {
+    func checkAndRun(_ eventSource: EventSourceSession) throws {
         try checkSessionIsClean(eventSource)
-        sessions.insert(eventSource)
+        runningSessions.insert(eventSource)
         eventSource.httpURLRequestExecutor = httpClientBridge
         eventSource.connect()
     }
@@ -36,12 +36,20 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
         }
     }
     
-    func forceRun(_ eventSource: EventSourceSession) {
+    func run(_ eventSource: EventSourceSession) {
         do {
-            try run(eventSource)
+            try checkAndRun(eventSource)
         } catch let error {
             assertionFailure(error.localizedDescription)
         }
+    }
+    
+    func stop(_ eventSource: EventSourceSession) {
+        guard let session = runningSessions.remove(eventSource) else {
+            return
+        }
+        session.close()
+        session.httpURLRequestExecutor = nil
     }
     
     func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
@@ -49,7 +57,7 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
     }
     
     private func taskEventDelegate(for task: URLSessionTask) -> URLSessionTaskEventDelegate? {
-        return sessions.first{$0.task == task}
+        return runningSessions.first{$0.task == task}
     }
 
     func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {

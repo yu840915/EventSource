@@ -20,7 +20,7 @@ class ConfigurationTests: XCTestCase {
 		super.setUp()
         sessionRunner = EventSourceSessionRunner()
         sut = TestableEventSource(url: domain, headers: ["Authorization" : "basic auth"])
-        sessionRunner.forceRun(sut)
+        sessionRunner.run(sut)
 	}
 
 	func testURL() {

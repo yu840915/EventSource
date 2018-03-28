@@ -31,4 +31,7 @@ class MockNSURLSessionDataTask: URLSessionDataTask {
     override var originalRequest: URLRequest? {
         return fakeRequest
     }
+    
+    override func cancel() {
+    }
 }
