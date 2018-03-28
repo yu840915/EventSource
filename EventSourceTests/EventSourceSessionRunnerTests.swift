@@ -102,6 +102,36 @@ class EventSourceSessionRunnerTests: XCTestCase {
         XCTAssertEqual(source1.didReceiveDataCounter, 1)
         XCTAssertEqual(source2.didReceiveDataCounter, 1)
     }
+    
+    func testNoMemoryLeak() {
+        var bridge: URLSessionBridge? = URLSessionBridge()
+        weak var bridgeRef: URLSessionBridge? = bridge
+        var runner: EventSourceSessionRunner? = EventSourceSessionRunner(httpClientWrapper: bridge!)
+        weak var runnerRef: EventSourceSessionRunner? = runner
+        var session1: EventSourceSession? = EventSourceSession(url: "https://push.wards.io/sse")
+        weak var session1Ref: EventSourceSession? = session1
+        var session2: EventSourceSession? = EventSourceSession(url: "https://push.wards.io/sse")
+        weak var session2Ref: EventSourceSession? = session2
+        
+        runner!.add(session1!)
+        runner!.add(session2!)
+        
+        bridge = nil
+        session1 = nil
+        session2 = nil
+        
+        XCTAssertNotNil(bridgeRef)
+        XCTAssertNotNil(runnerRef)
+        XCTAssertNotNil(session1Ref)
+        XCTAssertNotNil(session2Ref)
+
+        runner = nil
+        
+        XCTAssertNil(bridgeRef)
+        XCTAssertNil(runnerRef)
+        XCTAssertNil(session1Ref)
+        XCTAssertNil(session2Ref)
+    }
 }
 
 fileprivate class FakeHTTPClient: EventSourceHTTPClientBridging {
