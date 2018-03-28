@@ -14,13 +14,13 @@ class ConfigurationTests: XCTestCase {
 
 	let domain = "http://testdomain.com"
 	var sut: TestableEventSource!
-    var sessionManager: EventSourceSessionManager!
+    var sessionRunner: EventSourceSessionRunner!
 
 	override func setUp() {
 		super.setUp()
-        sessionManager = EventSourceSessionManager()
+        sessionRunner = EventSourceSessionRunner()
         sut = TestableEventSource(url: domain, headers: ["Authorization" : "basic auth"])
-        sessionManager.add(sut)
+        sessionRunner.add(sut)
 	}
 
 	func testURL() {
@@ -42,7 +42,7 @@ class ConfigurationTests: XCTestCase {
 
 		let username = "testUsername"
 		let password = "testPassword"
-		let basicAuthString = EventSource.basicAuth(username, password: password)
+		let basicAuthString = EventSourceSession.basicAuth(username, password: password)
 
 		XCTAssertEqual(basicAuthString, basicAuthToken)
 	}

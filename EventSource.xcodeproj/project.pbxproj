@@ -13,10 +13,10 @@
 		41DFE4311A8E686F000C3519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 41DFE4301A8E686F000C3519 /* Images.xcassets */; };
 		41DFE4341A8E686F000C3519 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 41DFE4321A8E686F000C3519 /* LaunchScreen.xib */; };
 		41DFE4401A8E6870000C3519 /* SplittedEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41DFE43F1A8E6870000C3519 /* SplittedEvents.swift */; };
-		41DFE44B1A8E6D6F000C3519 /* EventSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41DFE44A1A8E6D6F000C3519 /* EventSource.swift */; };
+		41DFE44B1A8E6D6F000C3519 /* EventSourceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41DFE44A1A8E6D6F000C3519 /* EventSourceSession.swift */; };
 		8E695B1E206B607E00CB3036 /* URLSessionBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E695B1D206B607E00CB3036 /* URLSessionBridge.swift */; };
-		8E932010206900BD0004BA1C /* EventSourceSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E93200F206900BD0004BA1C /* EventSourceSessionManager.swift */; };
-		8E932014206902AD0004BA1C /* EventSourceSessionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E932013206902AD0004BA1C /* EventSourceSessionManagerTests.swift */; };
+		8E932010206900BD0004BA1C /* EventSourceSessionRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E93200F206900BD0004BA1C /* EventSourceSessionRunner.swift */; };
+		8E932014206902AD0004BA1C /* EventSourceSessionRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E932013206902AD0004BA1C /* EventSourceSessionRunnerTests.swift */; };
 		C11719F61D19C16800807B3B /* TestableEventSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11719F51D19C16800807B3B /* TestableEventSource.swift */; };
 		C11719F81D19CF3F00807B3B /* MockNSURLSessionDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11719F71D19CF3F00807B3B /* MockNSURLSessionDataTask.swift */; };
 		C1F518E21C99D96200713047 /* EventSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1F518E11C99D96200713047 /* EventSourceTests.swift */; };
@@ -44,10 +44,10 @@
 		41DFE4391A8E6870000C3519 /* EventSourceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EventSourceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		41DFE43E1A8E6870000C3519 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		41DFE43F1A8E6870000C3519 /* SplittedEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplittedEvents.swift; sourceTree = "<group>"; };
-		41DFE44A1A8E6D6F000C3519 /* EventSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventSource.swift; sourceTree = "<group>"; };
+		41DFE44A1A8E6D6F000C3519 /* EventSourceSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventSourceSession.swift; sourceTree = "<group>"; };
 		8E695B1D206B607E00CB3036 /* URLSessionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionBridge.swift; sourceTree = "<group>"; };
-		8E93200F206900BD0004BA1C /* EventSourceSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSourceSessionManager.swift; sourceTree = "<group>"; };
-		8E932013206902AD0004BA1C /* EventSourceSessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSourceSessionManagerTests.swift; sourceTree = "<group>"; };
+		8E93200F206900BD0004BA1C /* EventSourceSessionRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSourceSessionRunner.swift; sourceTree = "<group>"; };
+		8E932013206902AD0004BA1C /* EventSourceSessionRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSourceSessionRunnerTests.swift; sourceTree = "<group>"; };
 		C11719F51D19C16800807B3B /* TestableEventSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestableEventSource.swift; sourceTree = "<group>"; };
 		C11719F71D19CF3F00807B3B /* MockNSURLSessionDataTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockNSURLSessionDataTask.swift; sourceTree = "<group>"; };
 		C1F518E11C99D96200713047 /* EventSourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventSourceTests.swift; sourceTree = "<group>"; };
@@ -120,7 +120,7 @@
 				41DFE43F1A8E6870000C3519 /* SplittedEvents.swift */,
 				C1F518E11C99D96200713047 /* EventSourceTests.swift */,
 				C1F518F91C99E3A300713047 /* ConfigurationTests.swift */,
-				8E932013206902AD0004BA1C /* EventSourceSessionManagerTests.swift */,
+				8E932013206902AD0004BA1C /* EventSourceSessionRunnerTests.swift */,
 				41DFE43D1A8E6870000C3519 /* Supporting Files */,
 			);
 			path = EventSourceTests;
@@ -137,8 +137,8 @@
 		41DFE4491A8E6B71000C3519 /* EventSource */ = {
 			isa = PBXGroup;
 			children = (
-				41DFE44A1A8E6D6F000C3519 /* EventSource.swift */,
-				8E93200F206900BD0004BA1C /* EventSourceSessionManager.swift */,
+				41DFE44A1A8E6D6F000C3519 /* EventSourceSession.swift */,
+				8E93200F206900BD0004BA1C /* EventSourceSessionRunner.swift */,
 				8E695B1D206B607E00CB3036 /* URLSessionBridge.swift */,
 			);
 			path = EventSource;
@@ -249,8 +249,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E695B1E206B607E00CB3036 /* URLSessionBridge.swift in Sources */,
-				8E932010206900BD0004BA1C /* EventSourceSessionManager.swift in Sources */,
-				41DFE44B1A8E6D6F000C3519 /* EventSource.swift in Sources */,
+				8E932010206900BD0004BA1C /* EventSourceSessionRunner.swift in Sources */,
+				41DFE44B1A8E6D6F000C3519 /* EventSourceSession.swift in Sources */,
 				41DFE42C1A8E686F000C3519 /* ViewController.swift in Sources */,
 				41DFE42A1A8E686F000C3519 /* AppDelegate.swift in Sources */,
 			);
@@ -260,7 +260,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8E932014206902AD0004BA1C /* EventSourceSessionManagerTests.swift in Sources */,
+				8E932014206902AD0004BA1C /* EventSourceSessionRunnerTests.swift in Sources */,
 				C1F518E21C99D96200713047 /* EventSourceTests.swift in Sources */,
 				41DFE4401A8E6870000C3519 /* SplittedEvents.swift in Sources */,
 				C11719F81D19CF3F00807B3B /* MockNSURLSessionDataTask.swift in Sources */,

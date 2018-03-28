@@ -15,8 +15,8 @@ class ViewController: UIViewController {
     @IBOutlet fileprivate weak var nameLabel: UILabel!
     @IBOutlet fileprivate weak var idLabel: UILabel!
     @IBOutlet fileprivate weak var squareConstraint: NSLayoutConstraint!
-    var eventSourceManager: EventSourceSessionManager!
-    var eventSource: EventSource?
+    var eventSourceManager: EventSourceSessionRunner!
+    var eventSource: EventSourceSession?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,10 +25,10 @@ class ViewController: UIViewController {
         let username = "fe8b0af5-1b50-467d-ac0b-b29d2d30136b"
         let password = "ae10ff39ca41dgf0a8"
 
-        let basicAuthAuthorization = EventSource.basicAuth(username, password: password)
+        let basicAuthAuthorization = EventSourceSession.basicAuth(username, password: password)
         
-        eventSourceManager = EventSourceSessionManager()
-        let source = EventSource(url: "https://push.wards.io/sse")
+        eventSourceManager = EventSourceSessionRunner()
+        let source = EventSourceSession(url: "https://push.wards.io/sse")
         self.eventSource = source
         eventSourceManager.add(source)
 

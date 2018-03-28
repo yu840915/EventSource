@@ -9,7 +9,7 @@
 import UIKit
 @testable import EventSource
 
-class TestableEventSource: EventSource {
+class TestableEventSource: EventSourceSession {
 
 	func callDidReceiveResponse() {
         didReceiveResponse(URLResponse(), forTask: task!)

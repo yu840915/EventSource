@@ -1,5 +1,5 @@
 //
-//  EventSourceSessionManager.swift
+//  EventSourceSessionRunner.swift
 //  EventSource
 //
 //  Created by Mike Yu on 26/03/2018.
@@ -12,9 +12,9 @@ protocol EventSourceHTTPClientBridging: HTTPURLRequestExecutable {
     weak var taskEventDelegate: URLSessionTaskEventDelegate? {get set}
 }
 
-public class EventSourceSessionManager: NSObject, URLSessionTaskEventDelegate {
+public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
     let httpClientBridge: EventSourceHTTPClientBridging
-    var eventSources = Set<EventSource>()
+    var eventSources = Set<EventSourceSession>()
     
     init(httpClientWrapper: EventSourceHTTPClientBridging = URLSessionBridge()) {
         self.httpClientBridge = httpClientWrapper
@@ -22,7 +22,7 @@ public class EventSourceSessionManager: NSObject, URLSessionTaskEventDelegate {
         httpClientWrapper.taskEventDelegate = self
     }
     
-    func add(_ eventSource: EventSource) {
+    func add(_ eventSource: EventSourceSession) {
         eventSources.insert(eventSource)
         eventSource.httpURLRequestExecutor = httpClientBridge
         eventSource.connect()

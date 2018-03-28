@@ -1,5 +1,5 @@
 //
-//  EventSource.swift
+//  EventSourceSession.swift
 //  EventSource
 //
 //  Created by Andres on 2/13/15.
@@ -24,7 +24,7 @@ protocol URLSessionTaskEventDelegate: AnyObject {
     func didCompleteTask(_ task: URLSessionTask, withError error: Error?)
 }
 
-open class EventSource: NSObject, URLSessionTaskEventDelegate {
+open class EventSourceSession: NSObject, URLSessionTaskEventDelegate {
 	static let DefaultsKey = "com.inaka.eventSource.lastEventId"
 
     let url: URL
@@ -66,7 +66,7 @@ open class EventSource: NSObject, URLSessionTaskEventDelegate {
         let scheme = url.scheme ?? ""
         
         uniqueIdentifier = "\(scheme).\(host).\(port).\(relativePath)"
-        lastEventIDKey = "\(EventSource.DefaultsKey).\(uniqueIdentifier)"
+        lastEventIDKey = "\(EventSourceSession.DefaultsKey).\(uniqueIdentifier)"
 
         super.init()
     }

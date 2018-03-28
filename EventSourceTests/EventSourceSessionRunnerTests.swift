@@ -1,5 +1,5 @@
 //
-//  EventSourceSessionManagerTests.swift
+//  EventSourceSessionRunnerTests.swift
 //  EventSourceTests
 //
 //  Created by Mike Yu on 26/03/2018.
@@ -9,15 +9,15 @@
 import XCTest
 @testable import EventSource
 
-class EventSourceSessionManagerTests: XCTestCase {
+class EventSourceSessionRunnerTests: XCTestCase {
     
     fileprivate var client: FakeHTTPClient!
-    var manager: EventSourceSessionManager!
+    var runner: EventSourceSessionRunner!
     
     override func setUp() {
         super.setUp()
         client = FakeHTTPClient()
-        manager = EventSourceSessionManager(httpClientWrapper: client)
+        runner = EventSourceSessionRunner(httpClientWrapper: client)
     }
     
     override func tearDown() {
@@ -25,11 +25,11 @@ class EventSourceSessionManagerTests: XCTestCase {
     }
     
     func testAddEventSourceToNewManager() {
-        let source = EventSource(url: "https://test.cc/sse")
-        manager.add(source)
+        let source = EventSourceSession(url: "https://test.cc/sse")
+        runner.add(source)
         
         XCTAssertNotNil(source.httpURLRequestExecutor)
-        XCTAssertTrue(manager.eventSources.contains(source))
+        XCTAssertTrue(runner.eventSources.contains(source))
         XCTAssertEqual(client.startingConnectionCounter, 1)
         XCTAssertNotNil(source.task)
         XCTAssertEqual(source.task, client.lastTask)
@@ -38,7 +38,7 @@ class EventSourceSessionManagerTests: XCTestCase {
     func testRelayCallbackReceived() {
         let source = CallbackCounterEventSource(url: "https://test.cc/sse")
         
-        manager.add(source)
+        runner.add(source)
         
         guard let task = client.lastTask else {
             XCTFail("Last task is nil")
@@ -49,19 +49,19 @@ class EventSourceSessionManagerTests: XCTestCase {
         
         XCTAssertEqual(source.readyState, .connecting)
         
-        manager.didReceiveResponse(response, forTask: task)
+        runner.didReceiveResponse(response, forTask: task)
         XCTAssertEqual(source.readyState, .open)
         XCTAssertEqual(source.didReceiveResponseCallbackCounter, 1)
         XCTAssertEqual(source.didReceiveDataCounter, 0)
         XCTAssertEqual(source.didCompleteCallbackCounter, 0)
         
         let eventData = "id: event-id\ndata:event-data\n\n".data(using: String.Encoding.utf8)!
-        manager.didReceiveData(eventData, forTask: task)
+        runner.didReceiveData(eventData, forTask: task)
         XCTAssertEqual(source.didReceiveResponseCallbackCounter, 1)
         XCTAssertEqual(source.didReceiveDataCounter, 1)
         XCTAssertEqual(source.didCompleteCallbackCounter, 0)
         
-        manager.didCompleteTask(task, withError: nil)
+        runner.didCompleteTask(task, withError: nil)
         XCTAssertEqual(source.readyState, .closed)
         XCTAssertEqual(source.didReceiveResponseCallbackCounter, 1)
         XCTAssertEqual(source.didReceiveDataCounter, 1)
@@ -72,12 +72,12 @@ class EventSourceSessionManagerTests: XCTestCase {
         let source1 = CallbackCounterEventSource(url: "https://test1.cc/sse")
         let source2 = CallbackCounterEventSource(url: "https://test2.cc/sse")
         
-        manager.add(source1)
+        runner.add(source1)
         guard let task1 = client.lastTask else {
             XCTFail("Task 1 is nil")
             return
         }
-        manager.add(source2)
+        runner.add(source2)
         guard let task2 = client.lastTask else {
             XCTFail("Task 2 is nil")
             return
@@ -89,15 +89,15 @@ class EventSourceSessionManagerTests: XCTestCase {
         let response2 = HTTPURLResponse(url: URL(string:"https://test2.cc/sse")!, statusCode: 200, httpVersion: "1.1", headerFields: nil)!
         task2.fakeResponse = response2
         
-        manager.didReceiveResponse(response1, forTask: task1)
-        manager.didReceiveResponse(response2, forTask: task2)
+        runner.didReceiveResponse(response1, forTask: task1)
+        runner.didReceiveResponse(response2, forTask: task2)
 
         XCTAssertEqual(source1.didReceiveResponseCallbackCounter, 1)
         XCTAssertEqual(source2.didReceiveResponseCallbackCounter, 1)
         
         let eventData = "id: event-id\ndata:event-data\n\n".data(using: String.Encoding.utf8)!
-        manager.didReceiveData(eventData, forTask: task1)
-        manager.didReceiveData(eventData, forTask: task2)
+        runner.didReceiveData(eventData, forTask: task1)
+        runner.didReceiveData(eventData, forTask: task2)
         
         XCTAssertEqual(source1.didReceiveDataCounter, 1)
         XCTAssertEqual(source2.didReceiveDataCounter, 1)
@@ -116,7 +116,7 @@ fileprivate class FakeHTTPClient: EventSourceHTTPClientBridging {
     }
 }
 
-fileprivate class CallbackCounterEventSource: EventSource {
+fileprivate class CallbackCounterEventSource: EventSourceSession {
     private(set) var didReceiveResponseCallbackCounter = 0
     private(set) var didCompleteCallbackCounter = 0
     private(set) var didReceiveDataCounter = 0
