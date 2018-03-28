@@ -24,7 +24,7 @@ protocol URLSessionTaskEventDelegate: AnyObject {
     func didCompleteTask(_ task: URLSessionTask, withError error: Error?)
 }
 
-open class EventSource: NSObject {
+open class EventSource: NSObject, URLSessionTaskEventDelegate {
 	static let DefaultsKey = "com.inaka.eventSource.lastEventId"
 
     let url: URL
@@ -308,9 +308,7 @@ open class EventSource: NSObject {
 
         return "Basic \(base64String)"
     }
-}
-
-extension EventSource: URLSessionTaskEventDelegate {
+    
     func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
         if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
             return

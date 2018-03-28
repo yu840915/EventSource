@@ -29,15 +29,19 @@ public class EventSourceSessionManager: NSObject, URLSessionTaskEventDelegate {
     }
     
     func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
-        eventSources.forEach{$0.didReceiveData(data, forTask: dataTask)}
+        taskEventDelegate(for: dataTask)?.didReceiveData(data, forTask: dataTask)
     }
     
+    private func taskEventDelegate(for task: URLSessionTask) -> URLSessionTaskEventDelegate? {
+        return eventSources.first{$0.task == task}
+    }
+
     func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
-        eventSources.forEach{$0.didCompleteTask(task, withError: error)}
+        taskEventDelegate(for: task)?.didCompleteTask(task, withError: error)
     }
     
     func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
-        eventSources.forEach{$0.didReceiveResponse(response, forTask: dataTask)}
+        taskEventDelegate(for: dataTask)?.didReceiveResponse(response, forTask: dataTask)
     }
 }
 
