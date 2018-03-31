@@ -79,8 +79,6 @@
 		8E59F415206F6CAA00536809 /* IKEventSource.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IKEventSource.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E59F417206F6CAA00536809 /* IKEventSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IKEventSource.h; sourceTree = "<group>"; };
 		8E59F418206F6CAA00536809 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8E59F424206F6CAA00536809 /* IKEventSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKEventSourceTests.swift; sourceTree = "<group>"; };
-		8E59F426206F6CAA00536809 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E695B1D206B607E00CB3036 /* URLSessionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionBridge.swift; sourceTree = "<group>"; };
 		8E93200F206900BD0004BA1C /* EventSourceSessionRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSourceSessionRunner.swift; sourceTree = "<group>"; };
 		8E932013206902AD0004BA1C /* EventSourceSessionRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSourceSessionRunnerTests.swift; sourceTree = "<group>"; };
@@ -123,7 +121,6 @@
 				41DFE4261A8E686F000C3519 /* EventSourceExample */,
 				41DFE43C1A8E6870000C3519 /* EventSourceTests */,
 				8E59F416206F6CAA00536809 /* IKEventSource */,
-				8E59F423206F6CAA00536809 /* IKEventSourceTests */,
 				41DFE4251A8E686F000C3519 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -198,15 +195,6 @@
 				8E59F418206F6CAA00536809 /* Info.plist */,
 			);
 			path = IKEventSource;
-			sourceTree = "<group>";
-		};
-		8E59F423206F6CAA00536809 /* IKEventSourceTests */ = {
-			isa = PBXGroup;
-			children = (
-				8E59F424206F6CAA00536809 /* IKEventSourceTests.swift */,
-				8E59F426206F6CAA00536809 /* Info.plist */,
-			);
-			path = IKEventSourceTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
