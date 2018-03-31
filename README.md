@@ -24,10 +24,10 @@ Also in `sse-server` folder you will find an extremely simple `node.js` server t
 
 ### Install
 
-You can just drag the `EventSource.swift` file to your project or using CocoaPods:
+You install the library through **Carthage**:
 
 ```
-pod 'IKEventSource'
+github "yu840915/EventSource"
 
 ```
 
@@ -64,7 +64,9 @@ eventSource.close();
 #### Swift API:
 
 ```swift
+var eventSourceRunner = EventSourceSessionRunner()
 var eventSource: EventSource = EventSource(url: server, headers: ["Authorization" : basicAuthAuthorization])
+eventSourceRunner.run(eventSource)
    
 eventSource.onOpen {
   // When opened
@@ -82,7 +84,7 @@ eventSource.addEventListener("event-name") { (id, event, data) in
   // Here you get an event 'event-name'
 }
 
-eventSource.close()
+eventSourceRunner.stop(eventSource)
 ```
 
 We added the following methods that are not available on JavaScript EventSource API but we think they might be useful:
@@ -191,3 +193,6 @@ Thanks to all the contributors for pointing out missing stuff or problems and fi
 
 ### Contact Us
 If you find any **bugs** or have a **problem** while using this library, please [open an issue](https://github.com/inaka/EventSource/issues/new) in this repo (or a pull request :)).
+
+### About the Forked Version
+This fork decouples the event source from the `NSURLSession` APIs. It is now able to work with any HTTP client library by providing object which implements `EventSourceHTTPClientBridging` for bridging the communications between `EventSource` and HTTP client.
