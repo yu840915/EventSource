@@ -14,11 +14,11 @@ public enum EventSourceState {
     case closed
 }
 
-protocol HTTPURLRequestExecutable: AnyObject {
+public protocol HTTPURLRequestExecutable: AnyObject {
     func execute(_ request: URLRequest) -> URLSessionDataTask?
 }
 
-protocol URLSessionTaskEventDelegate: AnyObject {
+public protocol URLSessionTaskEventDelegate: AnyObject {
     func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask)
     func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask)
     func didCompleteTask(_ task: URLSessionTask, withError error: Error?)
@@ -312,7 +312,7 @@ open class EventSourceSession: NSObject, URLSessionTaskEventDelegate {
         return "Basic \(base64String)"
     }
     
-    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
+    public func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
         if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
             return
         }
@@ -325,7 +325,7 @@ open class EventSourceSession: NSObject, URLSessionTaskEventDelegate {
         self.parseEventStream(eventStream)
     }
     
-    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
+    public func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
         if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
             return
         }
@@ -338,7 +338,7 @@ open class EventSourceSession: NSObject, URLSessionTaskEventDelegate {
         }
     }
     
-    func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
+    public func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
         self.readyState = EventSourceState.closed
         
         if self.receivedMessageToClose(task.response as? HTTPURLResponse) {

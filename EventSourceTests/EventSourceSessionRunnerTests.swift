@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import EventSource
+@testable import IKEventSource
 
 class EventSourceSessionRunnerTests: XCTestCase {
     

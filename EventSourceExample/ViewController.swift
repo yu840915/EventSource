@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import IKEventSource
 
 class ViewController: UIViewController {
 

@@ -13,9 +13,12 @@
 		41DFE4311A8E686F000C3519 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 41DFE4301A8E686F000C3519 /* Images.xcassets */; };
 		41DFE4341A8E686F000C3519 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 41DFE4321A8E686F000C3519 /* LaunchScreen.xib */; };
 		41DFE4401A8E6870000C3519 /* SplittedEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41DFE43F1A8E6870000C3519 /* SplittedEvents.swift */; };
-		41DFE44B1A8E6D6F000C3519 /* EventSourceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41DFE44A1A8E6D6F000C3519 /* EventSourceSession.swift */; };
-		8E695B1E206B607E00CB3036 /* URLSessionBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E695B1D206B607E00CB3036 /* URLSessionBridge.swift */; };
-		8E932010206900BD0004BA1C /* EventSourceSessionRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E93200F206900BD0004BA1C /* EventSourceSessionRunner.swift */; };
+		8E59F427206F6CAA00536809 /* IKEventSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 8E59F417206F6CAA00536809 /* IKEventSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8E59F42A206F6CAA00536809 /* IKEventSource.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E59F415206F6CAA00536809 /* IKEventSource.framework */; };
+		8E59F42B206F6CAA00536809 /* IKEventSource.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8E59F415206F6CAA00536809 /* IKEventSource.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8E59F433206F6D1C00536809 /* EventSourceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41DFE44A1A8E6D6F000C3519 /* EventSourceSession.swift */; };
+		8E59F434206F6D1C00536809 /* EventSourceSessionRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E93200F206900BD0004BA1C /* EventSourceSessionRunner.swift */; };
+		8E59F435206F6D1C00536809 /* URLSessionBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E695B1D206B607E00CB3036 /* URLSessionBridge.swift */; };
 		8E932014206902AD0004BA1C /* EventSourceSessionRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E932013206902AD0004BA1C /* EventSourceSessionRunnerTests.swift */; };
 		C11719F61D19C16800807B3B /* TestableEventSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11719F51D19C16800807B3B /* TestableEventSource.swift */; };
 		C11719F81D19CF3F00807B3B /* MockNSURLSessionDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11719F71D19CF3F00807B3B /* MockNSURLSessionDataTask.swift */; };
@@ -31,7 +34,35 @@
 			remoteGlobalIDString = 41DFE4231A8E686F000C3519;
 			remoteInfo = EventSource;
 		};
+		8E59F428206F6CAA00536809 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 41DFE41C1A8E686F000C3519 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8E59F414206F6CAA00536809;
+			remoteInfo = IKEventSource;
+		};
+		8E59F43C206F6FD200536809 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 41DFE41C1A8E686F000C3519 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8E59F414206F6CAA00536809;
+			remoteInfo = IKEventSource;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8E59F42F206F6CAA00536809 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8E59F42B206F6CAA00536809 /* IKEventSource.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		41DFE4241A8E686F000C3519 /* EventSource.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EventSource.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -45,6 +76,11 @@
 		41DFE43E1A8E6870000C3519 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		41DFE43F1A8E6870000C3519 /* SplittedEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplittedEvents.swift; sourceTree = "<group>"; };
 		41DFE44A1A8E6D6F000C3519 /* EventSourceSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventSourceSession.swift; sourceTree = "<group>"; };
+		8E59F415206F6CAA00536809 /* IKEventSource.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IKEventSource.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E59F417206F6CAA00536809 /* IKEventSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IKEventSource.h; sourceTree = "<group>"; };
+		8E59F418206F6CAA00536809 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8E59F424206F6CAA00536809 /* IKEventSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IKEventSourceTests.swift; sourceTree = "<group>"; };
+		8E59F426206F6CAA00536809 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8E695B1D206B607E00CB3036 /* URLSessionBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionBridge.swift; sourceTree = "<group>"; };
 		8E93200F206900BD0004BA1C /* EventSourceSessionRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSourceSessionRunner.swift; sourceTree = "<group>"; };
 		8E932013206902AD0004BA1C /* EventSourceSessionRunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSourceSessionRunnerTests.swift; sourceTree = "<group>"; };
@@ -59,10 +95,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E59F42A206F6CAA00536809 /* IKEventSource.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		41DFE4361A8E6870000C3519 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8E59F411206F6CAA00536809 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -78,6 +122,8 @@
 				41DFE4491A8E6B71000C3519 /* EventSource */,
 				41DFE4261A8E686F000C3519 /* EventSourceExample */,
 				41DFE43C1A8E6870000C3519 /* EventSourceTests */,
+				8E59F416206F6CAA00536809 /* IKEventSource */,
+				8E59F423206F6CAA00536809 /* IKEventSourceTests */,
 				41DFE4251A8E686F000C3519 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -87,6 +133,7 @@
 			children = (
 				41DFE4241A8E686F000C3519 /* EventSource.app */,
 				41DFE4391A8E6870000C3519 /* EventSourceTests.xctest */,
+				8E59F415206F6CAA00536809 /* IKEventSource.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -144,7 +191,36 @@
 			path = EventSource;
 			sourceTree = "<group>";
 		};
+		8E59F416206F6CAA00536809 /* IKEventSource */ = {
+			isa = PBXGroup;
+			children = (
+				8E59F417206F6CAA00536809 /* IKEventSource.h */,
+				8E59F418206F6CAA00536809 /* Info.plist */,
+			);
+			path = IKEventSource;
+			sourceTree = "<group>";
+		};
+		8E59F423206F6CAA00536809 /* IKEventSourceTests */ = {
+			isa = PBXGroup;
+			children = (
+				8E59F424206F6CAA00536809 /* IKEventSourceTests.swift */,
+				8E59F426206F6CAA00536809 /* Info.plist */,
+			);
+			path = IKEventSourceTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		8E59F412206F6CAA00536809 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8E59F427206F6CAA00536809 /* IKEventSource.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		41DFE4231A8E686F000C3519 /* EventSource */ = {
@@ -154,10 +230,12 @@
 				41DFE4201A8E686F000C3519 /* Sources */,
 				41DFE4211A8E686F000C3519 /* Frameworks */,
 				41DFE4221A8E686F000C3519 /* Resources */,
+				8E59F42F206F6CAA00536809 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				8E59F429206F6CAA00536809 /* PBXTargetDependency */,
 			);
 			name = EventSource;
 			productName = EventSource;
@@ -175,12 +253,31 @@
 			buildRules = (
 			);
 			dependencies = (
+				8E59F43D206F6FD200536809 /* PBXTargetDependency */,
 				41DFE43B1A8E6870000C3519 /* PBXTargetDependency */,
 			);
 			name = EventSourceTests;
 			productName = EventSourceTests;
 			productReference = 41DFE4391A8E6870000C3519 /* EventSourceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		8E59F414206F6CAA00536809 /* IKEventSource */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8E59F42C206F6CAA00536809 /* Build configuration list for PBXNativeTarget "IKEventSource" */;
+			buildPhases = (
+				8E59F410206F6CAA00536809 /* Sources */,
+				8E59F411206F6CAA00536809 /* Frameworks */,
+				8E59F412206F6CAA00536809 /* Headers */,
+				8E59F413206F6CAA00536809 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IKEventSource;
+			productName = IKEventSource;
+			productReference = 8E59F415206F6CAA00536809 /* IKEventSource.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
@@ -189,7 +286,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 0720;
+				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = Inaka;
 				TargetAttributes = {
@@ -201,6 +298,10 @@
 						CreatedOnToolsVersion = 6.0.1;
 						LastSwiftMigration = 0900;
 						TestTargetID = 41DFE4231A8E686F000C3519;
+					};
+					8E59F414206F6CAA00536809 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -219,6 +320,7 @@
 			targets = (
 				41DFE4231A8E686F000C3519 /* EventSource */,
 				41DFE4381A8E6870000C3519 /* EventSourceTests */,
+				8E59F414206F6CAA00536809 /* IKEventSource */,
 			);
 		};
 /* End PBXProject section */
@@ -241,6 +343,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8E59F413206F6CAA00536809 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -248,9 +357,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8E695B1E206B607E00CB3036 /* URLSessionBridge.swift in Sources */,
-				8E932010206900BD0004BA1C /* EventSourceSessionRunner.swift in Sources */,
-				41DFE44B1A8E6D6F000C3519 /* EventSourceSession.swift in Sources */,
 				41DFE42C1A8E686F000C3519 /* ViewController.swift in Sources */,
 				41DFE42A1A8E686F000C3519 /* AppDelegate.swift in Sources */,
 			);
@@ -269,6 +375,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8E59F410206F6CAA00536809 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8E59F434206F6D1C00536809 /* EventSourceSessionRunner.swift in Sources */,
+				8E59F435206F6D1C00536809 /* URLSessionBridge.swift in Sources */,
+				8E59F433206F6D1C00536809 /* EventSourceSession.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -276,6 +392,16 @@
 			isa = PBXTargetDependency;
 			target = 41DFE4231A8E686F000C3519 /* EventSource */;
 			targetProxy = 41DFE43A1A8E6870000C3519 /* PBXContainerItemProxy */;
+		};
+		8E59F429206F6CAA00536809 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8E59F414206F6CAA00536809 /* IKEventSource */;
+			targetProxy = 8E59F428206F6CAA00536809 /* PBXContainerItemProxy */;
+		};
+		8E59F43D206F6FD200536809 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8E59F414206F6CAA00536809 /* IKEventSource */;
+			targetProxy = 8E59F43C206F6FD200536809 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -401,7 +527,9 @@
 		41DFE4441A8E6870000C3519 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "$(SRCROOT)/EventSourceExample/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.inaka.$(PRODUCT_NAME:rfc1034identifier)";
@@ -414,7 +542,9 @@
 		41DFE4451A8E6870000C3519 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = "$(SRCROOT)/EventSourceExample/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.inaka.$(PRODUCT_NAME:rfc1034identifier)";
@@ -461,6 +591,70 @@
 			};
 			name = Release;
 		};
+		8E59F42D206F6CAA00536809 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = IKEventSource/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = sw.IKEventSource;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		8E59F42E206F6CAA00536809 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = IKEventSource/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = sw.IKEventSource;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -487,6 +681,15 @@
 			buildConfigurations = (
 				41DFE4471A8E6870000C3519 /* Debug */,
 				41DFE4481A8E6870000C3519 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8E59F42C206F6CAA00536809 /* Build configuration list for PBXNativeTarget "IKEventSource" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8E59F42D206F6CAA00536809 /* Debug */,
+				8E59F42E206F6CAA00536809 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

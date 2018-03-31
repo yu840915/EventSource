@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol EventSourceHTTPClientBridging: HTTPURLRequestExecutable {
+public protocol EventSourceHTTPClientBridging: HTTPURLRequestExecutable {
     weak var taskEventDelegate: URLSessionTaskEventDelegate? {get set}
 }
 
@@ -16,13 +16,13 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
     let httpClientBridge: EventSourceHTTPClientBridging
     var runningSessions = Set<EventSourceSession>()
     
-    init(httpClientWrapper: EventSourceHTTPClientBridging = URLSessionBridge()) {
+    public init(httpClientWrapper: EventSourceHTTPClientBridging = URLSessionBridge()) {
         self.httpClientBridge = httpClientWrapper
         super.init()
         httpClientWrapper.taskEventDelegate = self
     }
     
-    func checkAndRun(_ eventSource: EventSourceSession) throws {
+    public func checkAndRun(_ eventSource: EventSourceSession) throws {
         try checkSessionIsClean(eventSource)
         runningSessions.insert(eventSource)
         eventSource.httpURLRequestExecutor = httpClientBridge
@@ -36,7 +36,7 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
         }
     }
     
-    func run(_ eventSource: EventSourceSession) {
+    public func run(_ eventSource: EventSourceSession) {
         do {
             try checkAndRun(eventSource)
         } catch let error {
@@ -44,7 +44,7 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
         }
     }
     
-    func stop(_ eventSource: EventSourceSession) {
+    public func stop(_ eventSource: EventSourceSession) {
         guard let session = runningSessions.remove(eventSource) else {
             return
         }
@@ -52,7 +52,7 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
         session.httpURLRequestExecutor = nil
     }
     
-    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
+    public func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
         taskEventDelegate(for: dataTask)?.didReceiveData(data, forTask: dataTask)
     }
     
@@ -60,11 +60,11 @@ public class EventSourceSessionRunner: NSObject, URLSessionTaskEventDelegate {
         return runningSessions.first{$0.task == task}
     }
 
-    func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
+    public func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
         taskEventDelegate(for: task)?.didCompleteTask(task, withError: error)
     }
     
-    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
+    public func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
         taskEventDelegate(for: dataTask)?.didReceiveResponse(response, forTask: dataTask)
     }
 }

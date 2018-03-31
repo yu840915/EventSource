@@ -7,7 +7,7 @@
 //
 
 import UIKit
-@testable import EventSource
+@testable import IKEventSource
 
 class TestableEventSource: EventSourceSession {
 

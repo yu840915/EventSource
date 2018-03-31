@@ -9,7 +9,7 @@
 import Foundation
 
 final public class URLSessionBridge: NSObject, EventSourceHTTPClientBridging {
-    weak var taskEventDelegate: URLSessionTaskEventDelegate?
+    public weak var taskEventDelegate: URLSessionTaskEventDelegate?
     var urlSession: Foundation.URLSession!
     private var operationQueue = OperationQueue()
     private var delegateRelay: URLSessionTaskDelegateRelay!
@@ -24,7 +24,7 @@ final public class URLSessionBridge: NSObject, EventSourceHTTPClientBridging {
         relay.delgate = self
     }
     
-    func execute(_ request: URLRequest) -> URLSessionDataTask? {
+    public func execute(_ request: URLRequest) -> URLSessionDataTask? {
         let task = urlSession.dataTask(with: request)
         task.resume()
         return task
@@ -36,15 +36,15 @@ final public class URLSessionBridge: NSObject, EventSourceHTTPClientBridging {
 }
 
 extension URLSessionBridge: URLSessionTaskEventDelegate {
-    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
+    public func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
         taskEventDelegate?.didReceiveData(data, forTask: dataTask)
     }
     
-    func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
+    public func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
         taskEventDelegate?.didCompleteTask(task, withError: error)
     }
     
-    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
+    public func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
         taskEventDelegate?.didReceiveResponse(response, forTask: dataTask)
     }
 }
