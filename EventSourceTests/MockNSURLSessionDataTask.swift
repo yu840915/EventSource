@@ -10,15 +10,28 @@ import UIKit
 
 class MockNSURLSessionDataTask: URLSessionDataTask {
 
-	let fakeResponse: HTTPURLResponse
+	var fakeResponse: HTTPURLResponse?
+    var fakeRequest: URLRequest?
 
-	init(response: HTTPURLResponse) {
+	init(response: HTTPURLResponse?, request: URLRequest? = nil) {
 		self.fakeResponse = response
+        fakeRequest = request
 	}
 
-	override var response: HTTPURLResponse {
+	override var response: HTTPURLResponse? {
 		get {
 			return self.fakeResponse
 		}
 	}
+    
+    override var currentRequest: URLRequest? {
+        return fakeRequest
+    }
+    
+    override var originalRequest: URLRequest? {
+        return fakeRequest
+    }
+    
+    override func cancel() {
+    }
 }

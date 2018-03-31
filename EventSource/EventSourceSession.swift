@@ -1,5 +1,5 @@
 //
-//  EventSource.swift
+//  EventSourceSession.swift
 //  EventSource
 //
 //  Created by Andres on 2/13/15.
@@ -14,10 +14,23 @@ public enum EventSourceState {
     case closed
 }
 
-open class EventSource: NSObject, URLSessionDataDelegate {
+public protocol HTTPURLRequestExecutable: AnyObject {
+    func execute(_ request: URLRequest) -> URLSessionDataTask?
+}
+
+public protocol URLSessionTaskEventDelegate: AnyObject {
+    func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask)
+    func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask)
+    func didCompleteTask(_ task: URLSessionTask, withError error: Error?)
+}
+
+open class EventSourceSession: NSObject, URLSessionTaskEventDelegate {
 	static let DefaultsKey = "com.inaka.eventSource.lastEventId"
 
     let url: URL
+    var currentRequest: URLRequest? {
+        return task?.currentRequest
+    }
 	fileprivate let lastEventIDKey: String
     fileprivate let receivedString: NSString?
     fileprivate var onOpenCallback: (() -> Void)?
@@ -27,9 +40,8 @@ open class EventSource: NSObject, URLSessionDataDelegate {
     open fileprivate(set) var retryTime = 3000
     fileprivate var eventListeners = Dictionary<String, (_ id: String?, _ event: String?, _ data: String?) -> Void>()
     fileprivate var headers: Dictionary<String, String>
-    internal var urlSession: Foundation.URLSession?
+    var httpURLRequestExecutor: HTTPURLRequestExecutable?
     internal var task: URLSessionDataTask?
-    fileprivate var operationQueue: OperationQueue
     fileprivate var errorBeforeSetErrorCallBack: NSError?
     internal let receivedDataBuffer: NSMutableData
 	fileprivate let uniqueIdentifier: String
@@ -37,66 +49,56 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 
     var event = Dictionary<String, String>()
 
-
-    public init(url: String, headers: [String : String] = [:]) {
-
-        self.url = URL(string: url)!
-        self.headers = headers
-        self.readyState = EventSourceState.closed
-        self.operationQueue = OperationQueue()
-        self.receivedString = nil
-        self.receivedDataBuffer = NSMutableData()
-
-        let port = String(self.url.port ?? 80)
-		let relativePath = self.url.relativePath
-		let host = self.url.host ?? ""
-        let scheme = self.url.scheme ?? ""
-
-		self.uniqueIdentifier = "\(scheme).\(host).\(port).\(relativePath)"
-		self.lastEventIDKey = "\(EventSource.DefaultsKey).\(self.uniqueIdentifier)"
+    convenience public init(url: String, headers: [String : String] = [:]) {
+        self.init(url: URL(string: url)!, additionalHeaders: headers)
+    }
+    
+    public init(url: URL, additionalHeaders: [String: String] = [:]) {
+        self.url = url
+        headers = additionalHeaders
+        readyState = .closed
+        receivedString = nil
+        receivedDataBuffer = NSMutableData()
+        
+        let port = String(url.port ?? 80)
+        let relativePath = url.relativePath
+        let host = url.host ?? ""
+        let scheme = url.scheme ?? ""
+        
+        uniqueIdentifier = "\(scheme).\(host).\(port).\(relativePath)"
+        lastEventIDKey = "\(EventSourceSession.DefaultsKey).\(uniqueIdentifier)"
 
         super.init()
-        self.connect()
     }
-
+    
 //Mark: Connect
 
     func connect() {
+        guard let communicator = httpURLRequestExecutor else {
+            return
+        }
+        readyState = .connecting
+        task = communicator.execute(makeOpenRequest())
+    }
+    
+    private func makeOpenRequest() -> URLRequest {
         var additionalHeaders = self.headers
         if let eventID = self.lastEventID {
             additionalHeaders["Last-Event-Id"] = eventID
         }
-
         additionalHeaders["Accept"] = "text/event-stream"
         additionalHeaders["Cache-Control"] = "no-cache"
-
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = TimeInterval(INT_MAX)
-        configuration.timeoutIntervalForResource = TimeInterval(INT_MAX)
-        configuration.httpAdditionalHeaders = additionalHeaders
-
-        self.readyState = EventSourceState.connecting
-        self.urlSession = newSession(configuration)
-        self.task = urlSession!.dataTask(with: self.url)
-
-		self.resumeSession()
-    }
-
-	internal func resumeSession() {
-		self.task!.resume()
-	}
-
-    internal func newSession(_ configuration: URLSessionConfiguration) -> Foundation.URLSession {
-        return Foundation.URLSession(configuration: configuration,
-								 delegate: self,
-						    delegateQueue: operationQueue)
+        var request = URLRequest(url: url)
+        request.timeoutInterval = TimeInterval(INT_MAX)
+        additionalHeaders.forEach{request.setValue($0.value, forHTTPHeaderField: $0.key)}
+        return request
     }
 
 //Mark: Close
 
     open func close() {
         self.readyState = EventSourceState.closed
-        self.urlSession?.invalidateAndCancel()
+        task?.cancel()
     }
 
 	fileprivate func receivedMessageToClose(_ httpResponse: HTTPURLResponse?) -> Bool {
@@ -142,60 +144,6 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 		return Array(self.eventListeners.keys)
 	}
 
-//MARK: URLSessionDataDelegate
-
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-		if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
-			return
-		}
-
-		if self.readyState != EventSourceState.open {
-            return
-        }
-
-        self.receivedDataBuffer.append(data)
-        let eventStream = extractEventsFromBuffer()
-        self.parseEventStream(eventStream)
-    }
-
-    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        completionHandler(URLSession.ResponseDisposition.allow)
-
-		if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
-			return
-		}
-
-        self.readyState = EventSourceState.open
-        if self.onOpenCallback != nil {
-            DispatchQueue.main.async {
-                self.onOpenCallback!()
-            }
-        }
-    }
-
-    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        self.readyState = EventSourceState.closed
-
-		if self.receivedMessageToClose(task.response as? HTTPURLResponse) {
-			return
-		}
-
-        if error == nil || (error! as NSError).code != -999 {
-            let nanoseconds = Double(self.retryTime) / 1000.0 * Double(NSEC_PER_SEC)
-            let delayTime = DispatchTime.now() + Double(Int64(nanoseconds)) / Double(NSEC_PER_SEC)
-            DispatchQueue.main.asyncAfter(deadline: delayTime) {
-                self.connect()
-            }
-        }
-
-        DispatchQueue.main.async {
-            if let errorCallback = self.onErrorCallback {
-                errorCallback(error as NSError?)
-            } else {
-                self.errorBeforeSetErrorCallBack = error as NSError?
-            }
-        }
-    }
 
 //MARK: Helpers
 
@@ -363,4 +311,55 @@ open class EventSource: NSObject, URLSessionDataDelegate {
 
         return "Basic \(base64String)"
     }
+    
+    public func didReceiveData(_ data: Data, forTask dataTask: URLSessionDataTask) {
+        if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
+            return
+        }
+        guard self.readyState == EventSourceState.open else {
+            return
+        }
+        
+        self.receivedDataBuffer.append(data)
+        let eventStream = extractEventsFromBuffer()
+        self.parseEventStream(eventStream)
+    }
+    
+    public func didReceiveResponse(_ response: URLResponse, forTask dataTask: URLSessionDataTask) {
+        if self.receivedMessageToClose(dataTask.response as? HTTPURLResponse) {
+            return
+        }
+        
+        self.readyState = EventSourceState.open
+        if self.onOpenCallback != nil {
+            DispatchQueue.main.async {
+                self.onOpenCallback!()
+            }
+        }
+    }
+    
+    public func didCompleteTask(_ task: URLSessionTask, withError error: Error?) {
+        self.readyState = EventSourceState.closed
+        
+        if self.receivedMessageToClose(task.response as? HTTPURLResponse) {
+            return
+        }
+        
+        if error == nil || (error! as NSError).code != NSURLErrorCancelled {
+            let nanoseconds = Double(self.retryTime) / 1000.0 * Double(NSEC_PER_SEC)
+            let delayTime = DispatchTime.now() + Double(Int64(nanoseconds)) / Double(NSEC_PER_SEC)
+            DispatchQueue.main.asyncAfter(deadline: delayTime) {
+                self.connect()
+            }
+        }
+        
+        DispatchQueue.main.async {
+            if let errorCallback = self.onErrorCallback {
+                errorCallback(error as NSError?)
+            } else {
+                self.errorBeforeSetErrorCallBack = error as NSError?
+            }
+        }
+    }
 }
+

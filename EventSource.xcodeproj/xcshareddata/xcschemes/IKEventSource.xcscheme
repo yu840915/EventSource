@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0900"
+   LastUpgradeVersion = "0920"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "41DFE4231A8E686F000C3519"
-               BuildableName = "EventSource.app"
-               BlueprintName = "EventSource"
+               BlueprintIdentifier = "8E59F414206F6CAA00536809"
+               BuildableName = "IKEventSource.framework"
+               BlueprintName = "IKEventSource"
                ReferencedContainer = "container:EventSource.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -34,6 +34,20 @@
                ReferencedContainer = "container:EventSource.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "41DFE4231A8E686F000C3519"
+               BuildableName = "EventSource.app"
+               BlueprintName = "EventSource"
+               ReferencedContainer = "container:EventSource.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -41,36 +55,18 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       language = ""
-      shouldUseLaunchSchemeArgsEnv = "NO"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "41DFE4381A8E6870000C3519"
-               BuildableName = "EventSourceTests.xctest"
-               BlueprintName = "EventSourceTests"
-               ReferencedContainer = "container:EventSource.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "41DFE4231A8E686F000C3519"
-            BuildableName = "EventSource.app"
-            BlueprintName = "EventSource"
+            BlueprintIdentifier = "8E59F414206F6CAA00536809"
+            BuildableName = "IKEventSource.framework"
+            BlueprintName = "IKEventSource"
             ReferencedContainer = "container:EventSource.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "runningTests"
-            value = "true"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -85,16 +81,15 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "41DFE4231A8E686F000C3519"
-            BuildableName = "EventSource.app"
-            BlueprintName = "EventSource"
+            BlueprintIdentifier = "8E59F414206F6CAA00536809"
+            BuildableName = "IKEventSource.framework"
+            BlueprintName = "IKEventSource"
             ReferencedContainer = "container:EventSource.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -104,16 +99,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "41DFE4231A8E686F000C3519"
-            BuildableName = "EventSource.app"
-            BlueprintName = "EventSource"
+            BlueprintIdentifier = "8E59F414206F6CAA00536809"
+            BuildableName = "IKEventSource.framework"
+            BlueprintName = "IKEventSource"
             ReferencedContainer = "container:EventSource.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

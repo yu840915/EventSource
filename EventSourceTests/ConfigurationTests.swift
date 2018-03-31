@@ -8,16 +8,19 @@
 
 import UIKit
 import XCTest
-@testable import EventSource
+@testable import IKEventSource
 
 class ConfigurationTests: XCTestCase {
 
 	let domain = "http://testdomain.com"
 	var sut: TestableEventSource!
+    var sessionRunner: EventSourceSessionRunner!
 
 	override func setUp() {
-		sut = TestableEventSource(url: domain, headers: ["Authorization" : "basic auth"])
 		super.setUp()
+        sessionRunner = EventSourceSessionRunner()
+        sut = TestableEventSource(url: domain, headers: ["Authorization" : "basic auth"])
+        sessionRunner.run(sut)
 	}
 
 	func testURL() {
@@ -39,7 +42,7 @@ class ConfigurationTests: XCTestCase {
 
 		let username = "testUsername"
 		let password = "testPassword"
-		let basicAuthString = EventSource.basicAuth(username, password: password)
+		let basicAuthString = EventSourceSession.basicAuth(username, password: password)
 
 		XCTAssertEqual(basicAuthString, basicAuthToken)
 	}

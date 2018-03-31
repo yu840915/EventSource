@@ -8,15 +8,18 @@
 
 import UIKit
 import XCTest
-@testable import EventSource
+@testable import IKEventSource
 
 class SplittedEvents: XCTestCase {
 
     var sut: TestableEventSource!
+    var sessionRunner: EventSourceSessionRunner!
 
 	override func setUp() {
-		sut = TestableEventSource(url: "http://test.com", headers: ["Authorization" : "basic auth"])
-		super.setUp()
+        super.setUp()
+        sessionRunner = EventSourceSessionRunner()
+        sut = TestableEventSource(url: "http://test.com", headers: ["Authorization" : "basic auth"])
+        sessionRunner.run(sut)
 	}
 
 	func testEventDataIsRemovedFromBufferWhenProcessed() {
